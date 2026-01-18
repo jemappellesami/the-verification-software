@@ -17,6 +17,12 @@ type ServerPanelProps = {
   isCustomMalicious: boolean;
   noiseModels: string[];
   maliciousModels: string[];
+  model: string;
+  models: string[];
+  isModelMenuOpen: boolean;
+  onOpenModelMenu: () => void;
+  onCloseModelMenu: () => void;
+  onSelectModel: (value: string) => void;
 };
 
 function ServerPanel({
@@ -32,17 +38,76 @@ function ServerPanel({
   isCustomMalicious,
   noiseModels,
   maliciousModels,
+  model,
+  models,
+  isModelMenuOpen,
+  onOpenModelMenu,
+  onCloseModelMenu,
+  onSelectModel,
 }: ServerPanelProps) {
   const isHonest = serverMode === "Honest";
 
   return (
     <div className="panel server">
       <PanelHeader
-        badgeLabel="Server"
-        badgeVariant="secondary"
         title="Server Behavior"
-        status="Monitoring enabled"
-        statusVariant="warning"
+        rightContent={
+          <div className="header-actions">
+            <div className="model-menu-wrap">
+              <button
+                className="model-chip model-chip-button"
+                onClick={onOpenModelMenu}
+                type="button"
+                aria-haspopup="dialog"
+                aria-expanded={isModelMenuOpen}
+              >
+                <span className="chip-label">Computation model</span>
+                <span className="chip-value">{model}</span>
+              </button>
+              {isModelMenuOpen ? (
+                <div
+                  className="model-menu"
+                  role="dialog"
+                  aria-label="Choose computation model"
+                  onClick={(event) => event.stopPropagation()}
+                >
+                  <p className="helper">Choose a computation model.</p>
+                  <div className="model-menu-actions">
+                    {models.map((option) => (
+                      <button
+                        key={option}
+                        type="button"
+                        className={
+                          option === model
+                            ? "toggle-button is-active"
+                            : "toggle-button"
+                        }
+                        onMouseDown={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                        }}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          event.stopPropagation();
+                          onSelectModel(option);
+                        }}
+                      >
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    type="button"
+                    className="ghost model-menu-close"
+                    onClick={onCloseModelMenu}
+                  >
+                    Close
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        }
       />
       <div className="panel-body">
         <div className="section">

@@ -37,7 +37,6 @@ function ClientPanel({
   return (
     <div className="panel client">
       <PanelHeader
-        badgeLabel="Client"
         title="Client Configuration"
         status="Channel ready"
       />

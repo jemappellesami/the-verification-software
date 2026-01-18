@@ -62,72 +62,45 @@ body::before {
   position: relative;
 }
 
-.layout {
-  --sidebar-width: 360px;
-  display: grid;
-  grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
-  gap: 32px;
-  align-items: start;
-  transition: grid-template-columns 0.35s ease;
-}
-
-.layout.is-collapsed {
-  --sidebar-width: 0px;
-}
-
-.sidebar {
-  position: sticky;
-  top: 24px;
-  align-self: start;
-  transition: transform 0.35s ease, opacity 0.35s ease;
-  overflow: hidden;
-}
-
-.sidebar:not(.is-open) {
-  transform: translateX(-24px);
-  opacity: 0;
-  pointer-events: none;
-}
-
 .main {
   min-width: 0;
-}
-
-.sidebar-toggle {
-  margin-bottom: 16px;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 20px;
 }
 
 .model-chip {
   display: grid;
   gap: 4px;
-  padding: 10px 16px;
+  padding: 8px 14px;
   border-radius: 16px;
   border: 1px solid rgba(230, 238, 247, 0.18);
   background: rgba(8, 12, 20, 0.65);
-  min-width: 220px;
+  width: 340px;
+  min-height: 54px;
 }
 
 .chip-label {
   text-transform: uppercase;
   letter-spacing: 0.2em;
-  font-size: 0.65rem;
+  font-size: 0.6rem;
   color: var(--muted);
 }
 
 .chip-value {
   font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--ink);
 }
 
-.model-action {
-  padding: 12px 18px;
+.model-chip-button {
+  text-align: left;
+  cursor: pointer;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .orb {
@@ -153,19 +126,6 @@ body::before {
   bottom: 100px;
   left: -60px;
   animation-delay: -5s;
-}
-
-.hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
-  gap: 32px;
-  align-items: center;
-  margin-bottom: 0;
-}
-
-.sidebar .hero {
-  grid-template-columns: 1fr;
-  gap: 24px;
 }
 
 .kicker {
@@ -208,63 +168,37 @@ body::before {
   text-transform: uppercase;
 }
 
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(3, 6, 12, 0.72);
-  display: grid;
-  place-items: center;
+.model-menu-wrap {
+  position: relative;
   z-index: 10;
-  padding: 24px;
-  opacity: 0;
-  transition: opacity 0.24s ease;
 }
 
-.modal {
-  width: min(520px, 92vw);
-  background: rgba(15, 22, 36, 0.96);
-  border-radius: 20px;
-  padding: 28px;
-  border: 1px solid rgba(230, 238, 247, 0.12);
-  box-shadow: 0 28px 60px rgba(0, 0, 0, 0.45);
-  transform: translateY(12px) scale(0.98);
-  opacity: 0;
-  transition: transform 0.24s ease, opacity 0.24s ease;
-}
-
-.modal-overlay.is-open {
-  opacity: 1;
-}
-
-.modal-overlay.is-open .modal {
-  transform: translateY(0) scale(1);
-  opacity: 1;
-}
-
-.modal-overlay.is-closing {
-  opacity: 0;
-}
-
-.modal-overlay.is-closing .modal {
-  transform: translateY(8px) scale(0.98);
-  opacity: 0;
-}
-
-.modal h3 {
-  margin-top: 0;
-  margin-bottom: 8px;
-  font-size: 1.35rem;
-}
-
-.modal-actions {
+.model-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 280px;
+  padding: 16px;
+  border-radius: 16px;
+  background: rgba(12, 18, 30, 0.98);
+  border: 1px solid rgba(230, 238, 247, 0.14);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
   display: grid;
   gap: 12px;
-  margin: 20px 0 16px;
+  z-index: 12;
+  pointer-events: auto;
+  animation: rise 0.2s ease;
 }
 
-.modal-close {
+.model-menu-actions {
+  display: grid;
+  gap: 10px;
+}
+
+.model-menu-close {
   width: 100%;
 }
+
 
 button {
   border: none;
@@ -619,29 +553,6 @@ input[type="range"] {
 }
 
 @media (max-width: 960px) {
-  .layout {
-    grid-template-columns: 1fr;
-  }
-
-  .sidebar {
-    position: relative;
-    top: 0;
-  }
-
-  .sidebar:not(.is-open) {
-    transform: translateY(-16px);
-    max-height: 0;
-    overflow: hidden;
-  }
-
-  .hero {
-    grid-template-columns: 1fr;
-  }
-
-  .hero-actions {
-    justify-content: flex-start;
-  }
-
   .dashboard-right {
     min-height: 0;
   }

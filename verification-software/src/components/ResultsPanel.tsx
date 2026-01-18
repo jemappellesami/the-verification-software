@@ -33,7 +33,6 @@ function ResultsPanel({
     <div className="panel results">
       <div className="panel-header">
         <div>
-          <span className="badge tertiary">Results</span>
           <h2>Verification Results</h2>
         </div>
         <span className="status">{statusText}</span>

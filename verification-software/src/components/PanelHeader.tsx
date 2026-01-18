@@ -1,9 +1,12 @@
+import type { ReactNode } from "react";
+
 type PanelHeaderProps = {
-  badgeLabel: string;
+  badgeLabel?: string;
   badgeVariant?: string;
   title: string;
-  status: string;
+  status?: string;
   statusVariant?: string;
+  rightContent?: ReactNode;
 };
 
 function PanelHeader({
@@ -12,6 +15,7 @@ function PanelHeader({
   title,
   status,
   statusVariant,
+  rightContent,
 }: PanelHeaderProps) {
   const badgeClass = badgeVariant ? `badge ${badgeVariant}` : "badge";
   const statusClass = statusVariant ? `status ${statusVariant}` : "status";
@@ -19,10 +23,14 @@ function PanelHeader({
   return (
     <div className="panel-header">
       <div>
-        <span className={badgeClass}>{badgeLabel}</span>
+        {badgeLabel ? <span className={badgeClass}>{badgeLabel}</span> : null}
         <h2>{title}</h2>
       </div>
-      <span className={statusClass}>{status}</span>
+      {rightContent ? (
+        rightContent
+      ) : status ? (
+        <span className={statusClass}>{status}</span>
+      ) : null}
     </div>
   );
 }

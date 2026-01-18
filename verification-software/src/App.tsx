@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import "./App.css";
 import ClientPanel from "./components/ClientPanel";
 import InsightsSection from "./components/InsightsSection";
@@ -28,6 +28,15 @@ const maliciousModels = [
   "Custom malicious model",
 ];
 
+const progressSteps = [
+  "Preparing qubits",
+  "Blinding the computation",
+  "Communicating qubits to Server",
+  "Decode measurement outcomes",
+  "Checking traps",
+  "Performing Majority Vote",
+];
+
 function App() {
   const [model, setModel] = useState(models[0]);
   const [isModelMenuOpen, setIsModelMenuOpen] = useState(false);
@@ -44,6 +53,11 @@ function App() {
   const [isResultsStale, setIsResultsStale] = useState(false);
   const [failedTestRounds, setFailedTestRounds] = useState(0);
   const [resultBit, setResultBit] = useState<number | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [progressLabel, setProgressLabel] = useState(progressSteps[0]);
+  const [isProgressVisible, setIsProgressVisible] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const progressTimerRef = useRef<number | null>(null);
 
   const acceptedFailuresMax = useMemo(() => Math.max(testRounds - 1, 0), [
     testRounds,
@@ -54,6 +68,14 @@ function App() {
     setIsResultsStale(true);
     setFailedTestRounds(0);
     setResultBit(null);
+    setProgress(0);
+    setProgressLabel(progressSteps[0]);
+    setIsProgressVisible(false);
+    setIsVerifying(false);
+    if (progressTimerRef.current) {
+      window.clearInterval(progressTimerRef.current);
+      progressTimerRef.current = null;
+    }
   };
 
   const handleTestRounds = (value: number) => {
@@ -98,12 +120,61 @@ function App() {
   };
 
   const handleDelegateVerify = () => {
-    const safeTestRounds = Math.max(testRounds, 1);
-    const failures = Math.floor(Math.random() * safeTestRounds);
-    setFailedTestRounds(failures);
-    setResultBit(Math.random() < 0.5 ? 0 : 1);
-    setHasResults(true);
+    if (isVerifying) {
+      return;
+    }
+
+    const totalDuration = 3000;
+    const startTime = performance.now();
+
+    setHasResults(false);
     setIsResultsStale(false);
+    setIsProgressVisible(true);
+    setIsVerifying(true);
+    setProgress(0);
+    setProgressLabel(progressSteps[0]);
+
+    if (progressTimerRef.current) {
+      window.clearInterval(progressTimerRef.current);
+    }
+
+    progressTimerRef.current = window.setInterval(() => {
+      const elapsed = performance.now() - startTime;
+      const ratio = Math.min(elapsed / totalDuration, 1);
+      const nextProgress = Math.round(ratio * 100);
+      const stepIndex = Math.min(
+        progressSteps.length - 1,
+        Math.floor(ratio * progressSteps.length)
+      );
+
+      setProgress(nextProgress);
+      setProgressLabel(progressSteps[stepIndex]);
+
+      if (ratio >= 1) {
+        const safeTestRounds = Math.max(testRounds, 1);
+        const failures = Math.floor(Math.random() * safeTestRounds);
+        setFailedTestRounds(failures);
+        setResultBit(Math.random() < 0.5 ? 0 : 1);
+        setHasResults(true);
+        setIsVerifying(false);
+        if (progressTimerRef.current) {
+          window.clearInterval(progressTimerRef.current);
+          progressTimerRef.current = null;
+        }
+      }
+    }, 50);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (progressTimerRef.current) {
+        window.clearInterval(progressTimerRef.current);
+      }
+    };
+  }, []);
+
+  const handleDelegateVerifyClick = () => {
+    handleDelegateVerify();
   };
 
   const handleComputationRounds = (value: number) => {
@@ -169,10 +240,29 @@ function App() {
       </div>
 
       <div className="cta-row">
-        <button className="primary cta-button" onClick={handleDelegateVerify}>
+        <button
+          className="primary cta-button"
+          onClick={handleDelegateVerifyClick}
+          type="button"
+          disabled={isVerifying}
+        >
           Delegate and Verify
         </button>
       </div>
+      {isProgressVisible ? (
+        <div className="progress-panel" aria-live="polite">
+          <div className="progress-header">
+            <span className="progress-label">{progressLabel}</span>
+            <span className="progress-value">{progress}%</span>
+          </div>
+          <div className="progress-track">
+            <div
+              className="progress-fill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+        </div>
+      ) : null}
 
       <InsightsSection
         strategy={strategy}

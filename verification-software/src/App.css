@@ -309,6 +309,13 @@ button {
   gap: 28px;
 }
 
+.dashboard-right {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  min-height: 720px;
+}
+
 .panel {
   background: var(--panel);
   border-radius: var(--radius);
@@ -346,6 +353,11 @@ button {
   color: #b5f1ec;
 }
 
+.badge.tertiary {
+  background: rgba(215, 183, 123, 0.18);
+  color: #f1d8a4;
+}
+
 .status {
   font-size: 0.85rem;
   font-weight: 600;
@@ -359,6 +371,97 @@ button {
 .panel-body {
   display: grid;
   gap: 20px;
+}
+
+.panel.server {
+  flex: 3;
+}
+
+.panel.results {
+  flex: 1;
+  min-height: 220px;
+}
+
+.results-body {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: stretch;
+  gap: 16px;
+}
+
+.failure-meter {
+  display: grid;
+  gap: 10px;
+}
+
+.verdict {
+  margin-top: 4px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  max-width: fit-content;
+}
+
+.verdict.accepted {
+  background: rgba(86, 198, 198, 0.18);
+  color: #b5f1ec;
+  border: 1px solid rgba(86, 198, 198, 0.35);
+}
+
+.verdict.rejected {
+  background: rgba(255, 91, 91, 0.18);
+  color: #ffb1b1;
+  border: 1px solid rgba(255, 91, 91, 0.35);
+}
+
+.failure-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 600;
+}
+
+.failure-rate {
+  color: #ff5b5b;
+  font-weight: 700;
+}
+
+.meter-track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(230, 238, 247, 0.12);
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ff5b5b, #f79d65);
+  border-radius: inherit;
+}
+
+.result-bit {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(230, 238, 247, 0.12);
+  background: rgba(8, 12, 20, 0.55);
+  text-align: center;
+}
+
+.result-label {
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.65rem;
+  color: var(--muted);
+}
+
+.result-value {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .section h4 {
@@ -537,6 +640,10 @@ input[type="range"] {
 
   .hero-actions {
     justify-content: flex-start;
+  }
+
+  .dashboard-right {
+    min-height: 0;
   }
 }
 

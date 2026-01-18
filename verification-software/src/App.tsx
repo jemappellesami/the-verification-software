@@ -3,6 +3,7 @@ import "./App.css";
 import ClientPanel from "./components/ClientPanel";
 import HeroSection from "./components/HeroSection";
 import InsightsSection from "./components/InsightsSection";
+import ResultsPanel from "./components/ResultsPanel";
 import ServerPanel from "./components/ServerPanel";
 
 const models = [
@@ -42,10 +43,21 @@ function App() {
   const [computationRounds, setComputationRounds] = useState(48);
   const [testRounds, setTestRounds] = useState(20);
   const [acceptedFailures, setAcceptedFailures] = useState(3);
+  const [hasResults, setHasResults] = useState(false);
+  const [isResultsStale, setIsResultsStale] = useState(false);
+  const [failedTestRounds, setFailedTestRounds] = useState(0);
+  const [resultBit, setResultBit] = useState<number | null>(null);
 
   const acceptedFailuresMax = useMemo(() => Math.max(testRounds - 1, 0), [
     testRounds,
   ]);
+
+  const resetResults = () => {
+    setHasResults(false);
+    setIsResultsStale(true);
+    setFailedTestRounds(0);
+    setResultBit(null);
+  };
 
   const handleTestRounds = (value: number) => {
     const nextValue = Math.max(value, 1);
@@ -53,6 +65,7 @@ function App() {
     if (acceptedFailures >= nextValue) {
       setAcceptedFailures(Math.max(nextValue - 1, 0));
     }
+    resetResults();
   };
 
   const isCustomNoise = noiseModel === "Custom noise model";
@@ -84,6 +97,24 @@ function App() {
     setModel(nextModel);
     setComputationResetKey((prev) => prev + 1);
     closeModelModal();
+  };
+
+  const handleDelegateVerify = () => {
+    const failures = Math.floor(testRounds * 0.25);
+    setFailedTestRounds(failures);
+    setResultBit(0);
+    setHasResults(true);
+    setIsResultsStale(false);
+  };
+
+  const handleComputationRounds = (value: number) => {
+    setComputationRounds(value);
+    resetResults();
+  };
+
+  const handleAcceptedFailures = (value: number) => {
+    setAcceptedFailures(value);
+    resetResults();
   };
 
   return (
@@ -124,35 +155,47 @@ function App() {
               strategy={strategy}
               onStrategyChange={setStrategy}
               computationRounds={computationRounds}
-              onComputationRounds={setComputationRounds}
+              onComputationRounds={handleComputationRounds}
               testRounds={testRounds}
               onTestRounds={handleTestRounds}
               acceptedFailures={acceptedFailures}
-              onAcceptedFailures={setAcceptedFailures}
+              onAcceptedFailures={handleAcceptedFailures}
               acceptedFailuresMax={acceptedFailuresMax}
               verificationStrategies={verificationStrategies}
               computationResetKey={computationResetKey}
             />
-            <ServerPanel
-              serverMode={serverMode}
-              onServerMode={setServerMode}
-              honestMode={honestMode}
-              onHonestMode={setHonestMode}
-              noiseModel={noiseModel}
-              onNoiseModel={setNoiseModel}
-              maliciousModel={maliciousModel}
-              onMaliciousModel={setMaliciousModel}
-              isCustomNoise={isCustomNoise}
-              isCustomMalicious={isCustomMalicious}
-              noiseModels={noiseModels}
-              maliciousModels={maliciousModels}
-            />
+            <div className="dashboard-right">
+              <ServerPanel
+                serverMode={serverMode}
+                onServerMode={setServerMode}
+                honestMode={honestMode}
+                onHonestMode={setHonestMode}
+                noiseModel={noiseModel}
+                onNoiseModel={setNoiseModel}
+                maliciousModel={maliciousModel}
+                onMaliciousModel={setMaliciousModel}
+                isCustomNoise={isCustomNoise}
+                isCustomMalicious={isCustomMalicious}
+                noiseModels={noiseModels}
+                maliciousModels={maliciousModels}
+              />
+              <ResultsPanel
+                isVisible={hasResults}
+                isStale={isResultsStale}
+                failedTestRounds={failedTestRounds}
+                testRounds={testRounds}
+                acceptedFailures={acceptedFailures}
+                resultBit={resultBit}
+              />
+            </div>
           </section>
         </main>
       </div>
 
       <div className="cta-row">
-        <button className="primary cta-button">Delegate and Verify</button>
+        <button className="primary cta-button" onClick={handleDelegateVerify}>
+          Delegate and Verify
+        </button>
       </div>
 
       <InsightsSection

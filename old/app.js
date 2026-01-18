@@ -105,7 +105,7 @@ function HeroSection({ model, onModelChange }) {
   return (
     <header className="hero">
       <div className="hero-copy">
-        <p className="kicker">Delegated Quantum Verification</p>
+        <p className="kicker">Verify Delegated Quantum Computations</p>
         <h1>Protocol Control Dashboard</h1>
         <p className="subtitle">
           Shape how the client verifies computations, model the server, and stage

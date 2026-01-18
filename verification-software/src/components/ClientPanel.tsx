@@ -14,6 +14,7 @@ type ClientPanelProps = {
   onAcceptedFailures: (value: number) => void;
   acceptedFailuresMax: number;
   verificationStrategies: string[];
+  computationResetKey: number;
 };
 
 function ClientPanel({
@@ -27,6 +28,7 @@ function ClientPanel({
   onAcceptedFailures,
   acceptedFailuresMax,
   verificationStrategies,
+  computationResetKey,
 }: ClientPanelProps) {
   const handleStrategyChange = (event: ChangeEvent<HTMLSelectElement>) => {
     onStrategyChange(event.target.value);
@@ -43,6 +45,7 @@ function ClientPanel({
         <div className="section">
           <h4>Choose a computation</h4>
           <FileDrop
+            key={computationResetKey}
             label="Drop .qasm file"
             hint="Upload a quantum circuit description."
             accept=".qasm"

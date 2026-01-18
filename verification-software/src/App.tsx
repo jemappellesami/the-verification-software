@@ -58,7 +58,9 @@ function App() {
   const [progressLabel, setProgressLabel] = useState(progressSteps[0]);
   const [isProgressVisible, setIsProgressVisible] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isResultsGlow, setIsResultsGlow] = useState(false);
   const progressTimerRef = useRef<number | null>(null);
+  const glowTimerRef = useRef<number | null>(null);
 
   const acceptedFailuresMax = useMemo(() => Math.max(testRounds - 1, 0), [
     testRounds,
@@ -72,6 +74,10 @@ function App() {
     if (progressTimerRef.current) {
       window.clearInterval(progressTimerRef.current);
       progressTimerRef.current = null;
+    }
+    if (glowTimerRef.current) {
+      window.clearTimeout(glowTimerRef.current);
+      glowTimerRef.current = null;
     }
   };
 
@@ -170,6 +176,14 @@ function App() {
         setResultBit(Math.random() < 0.5 ? 0 : 1);
         setHasResults(true);
         setIsVerifying(false);
+        setIsResultsGlow(true);
+        if (glowTimerRef.current) {
+          window.clearTimeout(glowTimerRef.current);
+        }
+        glowTimerRef.current = window.setTimeout(() => {
+          setIsResultsGlow(false);
+          glowTimerRef.current = null;
+        }, 1200);
         if (progressTimerRef.current) {
           window.clearInterval(progressTimerRef.current);
           progressTimerRef.current = null;
@@ -182,6 +196,9 @@ function App() {
     return () => {
       if (progressTimerRef.current) {
         window.clearInterval(progressTimerRef.current);
+      }
+      if (glowTimerRef.current) {
+        window.clearTimeout(glowTimerRef.current);
       }
     };
   }, []);
@@ -243,6 +260,7 @@ function App() {
             <ResultsPanel
               isVisible={hasResults}
               isStale={isResultsStale}
+              isGlow={isResultsGlow}
               failedTestRounds={failedTestRounds}
               testRounds={testRounds}
               acceptedFailures={acceptedFailures}

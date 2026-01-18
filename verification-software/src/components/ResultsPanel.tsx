@@ -1,6 +1,7 @@
 type ResultsPanelProps = {
   isVisible: boolean;
   isStale: boolean;
+  isGlow: boolean;
   failedTestRounds: number;
   testRounds: number;
   acceptedFailures: number;
@@ -10,6 +11,7 @@ type ResultsPanelProps = {
 function ResultsPanel({
   isVisible,
   isStale,
+  isGlow,
   failedTestRounds,
   testRounds,
   acceptedFailures,
@@ -29,8 +31,10 @@ function ResultsPanel({
     ? "Parameters changed. Run Delegate and Verify again."
     : "Run Delegate and Verify to reveal failure rate and computation output.";
 
+  const panelClass = isGlow ? "panel results is-glow" : "panel results";
+
   return (
-    <div className="panel results">
+    <div className={panelClass}>
       <div className="panel-header">
         <div>
           <h2>Verification Results</h2>

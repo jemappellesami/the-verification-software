@@ -35,6 +35,7 @@ const progressSteps = [
   "Decode measurement outcomes",
   "Checking traps",
   "Performing Majority Vote",
+  "Complete!",
 ];
 
 function App() {
@@ -63,11 +64,7 @@ function App() {
     testRounds,
   ]);
 
-  const resetResults = () => {
-    setHasResults(false);
-    setIsResultsStale(true);
-    setFailedTestRounds(0);
-    setResultBit(null);
+  const clearProgress = () => {
     setProgress(0);
     setProgressLabel(progressSteps[0]);
     setIsProgressVisible(false);
@@ -76,6 +73,22 @@ function App() {
       window.clearInterval(progressTimerRef.current);
       progressTimerRef.current = null;
     }
+  };
+
+  const resetResults = () => {
+    setHasResults(false);
+    setIsResultsStale(true);
+    setFailedTestRounds(0);
+    setResultBit(null);
+    clearProgress();
+  };
+
+  const resetVerification = () => {
+    setHasResults(false);
+    setIsResultsStale(false);
+    setFailedTestRounds(0);
+    setResultBit(null);
+    clearProgress();
   };
 
   const handleTestRounds = (value: number) => {
@@ -240,29 +253,41 @@ function App() {
       </div>
 
       <div className="cta-row">
-        <button
-          className="primary cta-button"
-          onClick={handleDelegateVerifyClick}
-          type="button"
-          disabled={isVerifying}
-        >
-          Delegate and Verify
-        </button>
+        {isProgressVisible ? (
+          <div className="progress-wrap" aria-live="polite">
+            <div className="progress-panel">
+              <div className="progress-header">
+                <span className="progress-label">{progressLabel}</span>
+                <span className="progress-value">{progress}%</span>
+              </div>
+              <div className="progress-track">
+                <div
+                  className="progress-fill"
+                  style={{ width: `${progress}%` }}
+                />
+              </div>
+            </div>
+            {!isVerifying ? (
+              <button
+                type="button"
+                className="reset-button"
+                onClick={resetVerification}
+                aria-label="Reset verification"
+              >
+                Restart
+              </button>
+            ) : null}
+          </div>
+        ) : (
+          <button
+            className="primary cta-button"
+            onClick={handleDelegateVerifyClick}
+            type="button"
+          >
+            Delegate and Verify
+          </button>
+        )}
       </div>
-      {isProgressVisible ? (
-        <div className="progress-panel" aria-live="polite">
-          <div className="progress-header">
-            <span className="progress-label">{progressLabel}</span>
-            <span className="progress-value">{progress}%</span>
-          </div>
-          <div className="progress-track">
-            <div
-              className="progress-fill"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-      ) : null}
 
       <InsightsSection
         strategy={strategy}

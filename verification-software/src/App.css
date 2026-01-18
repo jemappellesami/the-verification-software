@@ -168,10 +168,17 @@ body::before {
   text-transform: uppercase;
 }
 
+.progress-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(100%, 640px);
+}
+
 .progress-panel {
-  margin: 16px auto 0;
+  margin: 0;
   max-width: 560px;
-  width: 100%;
+  width: min(100%, 560px);
   background: rgba(10, 16, 28, 0.7);
   border: 1px solid rgba(230, 238, 247, 0.1);
   border-radius: 16px;
@@ -209,6 +216,22 @@ body::before {
   background: linear-gradient(90deg, #56c6c6, #9fd7f5);
   border-radius: inherit;
   transition: width 0.05s linear;
+}
+
+.reset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid rgba(230, 238, 247, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  cursor: pointer;
+  padding: 12px 20px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  font-size: 0.85rem;
 }
 
 .model-menu-wrap {

@@ -38,10 +38,14 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       try {
         const payload = body ? JSON.parse(body) : {};
-        const python = spawn("python3", ["veriphix_instance.py"], {
-          cwd: __dirname,
-          stdio: ["pipe", "pipe", "pipe"],
-        });
+        const python = spawn(
+          `${__dirname}/veriphix/.venv/bin/python`,
+          ["veriphix_instance.py"],
+          {
+            cwd: __dirname,
+            stdio: ["pipe", "pipe", "pipe"],
+          }
+        );
 
         let stdout = "";
         let stderr = "";
@@ -60,6 +64,9 @@ const server = http.createServer((req, res) => {
         });
 
         python.on("close", (code) => {
+          if (stderr.trim()) {
+            console.error("Python stderr:", stderr.trim());
+          }
           if (code !== 0) {
             sendJson(res, 500, {
               error: "Python process failed",
@@ -74,6 +81,7 @@ const server = http.createServer((req, res) => {
               resultBit: Number(result.resultBit) === 1 ? 1 : 0,
             });
           } catch (error) {
+            console.error("Python stdout:", stdout.trim());
             sendJson(res, 500, { error: "Invalid response from Python" });
           }
         });

@@ -62,6 +62,7 @@ function App() {
   const [isProgressVisible, setIsProgressVisible] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
   const [isResultsGlow, setIsResultsGlow] = useState(false);
+  const [isAwaitingBackend, setIsAwaitingBackend] = useState(false);
   const progressTimerRef = useRef<number | null>(null);
   const glowTimerRef = useRef<number | null>(null);
   const requestIdRef = useRef(0);
@@ -99,6 +100,7 @@ function App() {
     setResultBit(null);
     setCorrectValue(null);
     setIsResultMatch(null);
+    setIsAwaitingBackend(false);
     clearProgress();
   };
 
@@ -112,6 +114,9 @@ function App() {
     setResultBit(result.resultBit);
     setCorrectValue(result.correctValue);
     setIsResultMatch(result.isMatch);
+    setIsAwaitingBackend(false);
+    setProgress(100);
+    setProgressLabel(progressSteps[progressSteps.length - 1]);
     setHasResults(true);
     setIsVerifying(false);
     setIsResultsGlow(true);
@@ -131,6 +136,7 @@ function App() {
     setResultBit(null);
     setCorrectValue(null);
     setIsResultMatch(null);
+    setIsAwaitingBackend(false);
     clearProgress();
   };
 
@@ -185,13 +191,14 @@ function App() {
     pendingResultRef.current = null;
     isProgressDoneRef.current = false;
 
-    const totalDuration = 3000;
+    const totalDuration = 5000;
     const startTime = performance.now();
 
     setHasResults(false);
     setIsResultsStale(false);
     setIsProgressVisible(true);
     setIsVerifying(true);
+    setIsAwaitingBackend(false);
     setProgress(0);
     setProgressLabel(progressSteps[0]);
 
@@ -215,6 +222,9 @@ function App() {
         isProgressDoneRef.current = true;
         if (pendingResultRef.current) {
           applyVerificationResults(pendingResultRef.current);
+        } else {
+          setIsAwaitingBackend(true);
+          setProgressLabel("Finishing soon...");
         }
         if (progressTimerRef.current) {
           window.clearInterval(progressTimerRef.current);
@@ -375,6 +385,9 @@ function App() {
                   style={{ width: `${progress}%` }}
                 />
               </div>
+              {isAwaitingBackend ? (
+                <p className="helper">Finishing soon...</p>
+              ) : null}
             </div>
             {!isVerifying ? (
               <button

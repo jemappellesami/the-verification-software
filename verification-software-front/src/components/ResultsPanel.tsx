@@ -6,6 +6,8 @@ type ResultsPanelProps = {
   testRounds: number;
   acceptedFailures: number;
   resultBit: number | null;
+  correctValue: number | null;
+  isMatch: boolean | null;
 };
 
 function ResultsPanel({
@@ -16,6 +18,8 @@ function ResultsPanel({
   testRounds,
   acceptedFailures,
   resultBit,
+  correctValue,
+  isMatch,
 }: ResultsPanelProps) {
   const safeTestRounds = Math.max(testRounds, 0);
   const failureRate =
@@ -48,8 +52,18 @@ function ResultsPanel({
           <>
             <div className="failure-meter">
               <div className="failure-header">
-                <span>Failure meter</span>
-                <span className="failure-rate">{roundedRate}%</span>
+                <span>
+                  Failure meter
+                  <span className="failure-count">
+                    {failedTestRounds}/{safeTestRounds} Failed test rounds 
+                  </span>
+                </span>
+                <span className="failure-rate">
+                  {roundedRate}%{" "}
+                  <span className={verdictClass}>
+                    {verdictLabel} (tolerated {acceptedFailures})
+                  </span>
+                </span>
               </div>
               <div className="meter-track">
                 <div
@@ -57,18 +71,24 @@ function ResultsPanel({
                   style={{ width: `${Math.min(roundedRate, 100)}%` }}
                 />
               </div>
-              <p className="helper">
-                {failedTestRounds} failed out of {safeTestRounds} test rounds.
-              </p>
-              <div className={verdictClass}>
-                {verdictLabel} (tolerated: {acceptedFailures})
-              </div>
             </div>
 
             <div className="result-bit">
               <span className="result-label">Result bit</span>
               <div className="result-value">
                 {resultBit === null ? "-" : resultBit}
+              </div>
+            </div>
+            <div className="result-bit">
+              <span className="result-label">Expected value</span>
+              <div className="result-value">
+                {correctValue === null ? "-" : correctValue}
+              </div>
+            </div>
+            <div className="result-bit">
+              <span className="result-label">Match</span>
+              <div className="result-value">
+                {isMatch === null ? "-" : isMatch ? "Yes" : "No"}
               </div>
             </div>
           </>

@@ -55,6 +55,8 @@ function App() {
   const [isResultsStale, setIsResultsStale] = useState(false);
   const [failedTestRounds, setFailedTestRounds] = useState(0);
   const [resultBit, setResultBit] = useState<number | null>(null);
+  const [correctValue, setCorrectValue] = useState<number | null>(null);
+  const [isResultMatch, setIsResultMatch] = useState<boolean | null>(null);
   const [progress, setProgress] = useState(0);
   const [progressLabel, setProgressLabel] = useState(progressSteps[0]);
   const [isProgressVisible, setIsProgressVisible] = useState(false);
@@ -66,6 +68,8 @@ function App() {
   const pendingResultRef = useRef<{
     failedTestRounds: number;
     resultBit: number;
+    correctValue: number | null;
+    isMatch: boolean | null;
   } | null>(null);
   const isProgressDoneRef = useRef(false);
 
@@ -93,15 +97,21 @@ function App() {
     setIsResultsStale(true);
     setFailedTestRounds(0);
     setResultBit(null);
+    setCorrectValue(null);
+    setIsResultMatch(null);
     clearProgress();
   };
 
   const applyVerificationResults = (result: {
     failedTestRounds: number;
     resultBit: number;
+    correctValue: number | null;
+    isMatch: boolean | null;
   }) => {
     setFailedTestRounds(result.failedTestRounds);
     setResultBit(result.resultBit);
+    setCorrectValue(result.correctValue);
+    setIsResultMatch(result.isMatch);
     setHasResults(true);
     setIsVerifying(false);
     setIsResultsGlow(true);
@@ -119,6 +129,8 @@ function App() {
     setIsResultsStale(false);
     setFailedTestRounds(0);
     setResultBit(null);
+    setCorrectValue(null);
+    setIsResultMatch(null);
     clearProgress();
   };
 
@@ -244,6 +256,9 @@ function App() {
         const result = {
           failedTestRounds: Number(data.failedTestRounds) || 0,
           resultBit: Number(data.resultBit) === 1 ? 1 : 0,
+          correctValue:
+            typeof data.correctValue === "number" ? data.correctValue : null,
+          isMatch: typeof data.isMatch === "boolean" ? data.isMatch : null,
         };
         pendingResultRef.current = result;
         if (isProgressDoneRef.current) {
@@ -339,6 +354,8 @@ function App() {
               testRounds={testRounds}
               acceptedFailures={acceptedFailures}
               resultBit={resultBit}
+              correctValue={correctValue}
+              isMatch={isResultMatch}
             />
           </div>
         </section>

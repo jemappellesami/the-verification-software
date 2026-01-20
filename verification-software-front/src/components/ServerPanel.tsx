@@ -2,7 +2,6 @@ import ToggleGroup from "./ToggleGroup";
 import PanelHeader from "./PanelHeader";
 import ServerHonestSection from "./ServerHonestSection";
 import ServerMaliciousSection from "./ServerMaliciousSection";
-import ChannelCard from "./ChannelCard";
 
 type ServerPanelProps = {
   serverMode: string;
@@ -145,7 +144,6 @@ function ServerPanel({
           />
         )}
 
-        <ChannelCard />
       </div>
     </div>
   );

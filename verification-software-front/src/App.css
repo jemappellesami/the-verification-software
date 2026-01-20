@@ -374,11 +374,11 @@ button {
 }
 
 .panel.server {
-  flex: 3;
+  flex: 2;
 }
 
 .panel.results {
-  flex: 1;
+  flex: 3;
   min-height: 220px;
   animation: none;
 }
@@ -388,7 +388,7 @@ button {
 }
 
 .results-body {
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(3, minmax(180px, 1fr));
   align-items: stretch;
   gap: 16px;
 }
@@ -396,6 +396,7 @@ button {
 .failure-meter {
   display: grid;
   gap: 10px;
+  grid-column: 1 / -1;
 }
 
 .verdict {
@@ -426,11 +427,22 @@ button {
   display: flex;
   justify-content: space-between;
   font-weight: 600;
+  gap: 12px;
 }
 
 .failure-rate {
   color: #ff5b5b;
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  text-align: right;
+}
+
+.failure-count {
+  margin-left: 10px;
+  font-weight: 600;
+  color: rgba(230, 238, 247, 0.75);
 }
 
 .meter-track {
@@ -649,6 +661,10 @@ input[type="range"] {
   .panel-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .results-body {
+    grid-template-columns: 1fr;
   }
 }
 

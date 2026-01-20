@@ -31,6 +31,12 @@ def pick_random_bqp_circuit():
     circuits = [name for name, prob in table.items() if prob < bqp_error or prob > 1 - bqp_error]
     return random.choice(circuits)
 
+def find_correct_value(circuit_name: str) -> int:
+    table_path = VERIPHIX_REPO / "circuits" / "table.json"
+    with table_path.open() as f:
+        table = json.load(f)
+    return int(round(table[circuit_name]))
+
 
 def main(payload):
     comp_rounds = int(payload.get("computationRounds", 1) or 1)
@@ -48,6 +54,7 @@ def main(payload):
 
     circuit_label = pick_random_bqp_circuit()
     pattern = load_pattern_from_circuit(circuit_label)
+    correct_value = find_correct_value(circuit_label)
     output_node = pattern.output_nodes[0]
 
     parameters = TrappifiedSchemeParameters(
@@ -88,9 +95,12 @@ def main(payload):
 
     failed_test_rounds = int(result_analysis.nr_failed_test_rounds)
     result_bit = int(computation_decision) if traps_decision else 0
+    is_match = result_bit == correct_value
     return {
         "failedTestRounds": failed_test_rounds,
         "resultBit": result_bit,
+        "correctValue": correct_value,
+        "isMatch": is_match,
     }
 
 

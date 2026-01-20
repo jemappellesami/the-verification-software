@@ -79,6 +79,12 @@ const server = http.createServer((req, res) => {
             sendJson(res, 200, {
               failedTestRounds: Number(result.failedTestRounds) || 0,
               resultBit: Number(result.resultBit) === 1 ? 1 : 0,
+              correctValue:
+                typeof result.correctValue === "number"
+                  ? result.correctValue
+                  : null,
+              isMatch:
+                typeof result.isMatch === "boolean" ? result.isMatch : null,
             });
           } catch (error) {
             console.error("Python stdout:", stdout.trim());

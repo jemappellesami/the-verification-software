@@ -18,6 +18,11 @@ This project showcases protocols for verification of delegated quantum computati
 cd /Users/sabdulsa/Codes/the-verification-software
 git submodule update --init --recursive
 ```
+Switch the Veriphix submodule to the `simulations` branch:
+```bash
+cd /Users/sabdulsa/Codes/the-verification-software/backend/veriphix
+git checkout simulations
+```
 
 ### 2) Create the Python environment for Veriphix
 The backend is configured to run the simulation using the virtual environment at `backend/veriphix/.venv`.

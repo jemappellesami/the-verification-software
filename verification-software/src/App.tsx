@@ -61,6 +61,12 @@ function App() {
   const [isResultsGlow, setIsResultsGlow] = useState(false);
   const progressTimerRef = useRef<number | null>(null);
   const glowTimerRef = useRef<number | null>(null);
+  const requestIdRef = useRef(0);
+  const pendingResultRef = useRef<{
+    failedTestRounds: number;
+    resultBit: number;
+  } | null>(null);
+  const isProgressDoneRef = useRef(false);
 
   const acceptedFailuresMax = useMemo(() => Math.max(testRounds - 1, 0), [
     testRounds,
@@ -87,6 +93,24 @@ function App() {
     setFailedTestRounds(0);
     setResultBit(null);
     clearProgress();
+  };
+
+  const applyVerificationResults = (result: {
+    failedTestRounds: number;
+    resultBit: number;
+  }) => {
+    setFailedTestRounds(result.failedTestRounds);
+    setResultBit(result.resultBit);
+    setHasResults(true);
+    setIsVerifying(false);
+    setIsResultsGlow(true);
+    if (glowTimerRef.current) {
+      window.clearTimeout(glowTimerRef.current);
+    }
+    glowTimerRef.current = window.setTimeout(() => {
+      setIsResultsGlow(false);
+      glowTimerRef.current = null;
+    }, 1200);
   };
 
   const resetVerification = () => {
@@ -143,6 +167,11 @@ function App() {
       return;
     }
 
+    const requestId = requestIdRef.current + 1;
+    requestIdRef.current = requestId;
+    pendingResultRef.current = null;
+    isProgressDoneRef.current = false;
+
     const totalDuration = 3000;
     const startTime = performance.now();
 
@@ -170,26 +199,62 @@ function App() {
       setProgressLabel(progressSteps[stepIndex]);
 
       if (ratio >= 1) {
-        const safeTestRounds = Math.max(testRounds, 1);
-        const failures = Math.floor(Math.random() * safeTestRounds);
-        setFailedTestRounds(failures);
-        setResultBit(Math.random() < 0.5 ? 0 : 1);
-        setHasResults(true);
-        setIsVerifying(false);
-        setIsResultsGlow(true);
-        if (glowTimerRef.current) {
-          window.clearTimeout(glowTimerRef.current);
+        isProgressDoneRef.current = true;
+        if (pendingResultRef.current) {
+          applyVerificationResults(pendingResultRef.current);
         }
-        glowTimerRef.current = window.setTimeout(() => {
-          setIsResultsGlow(false);
-          glowTimerRef.current = null;
-        }, 1200);
         if (progressTimerRef.current) {
           window.clearInterval(progressTimerRef.current);
           progressTimerRef.current = null;
         }
       }
     }, 50);
+
+    const payload = {
+      model,
+      strategy,
+      computationRounds,
+      testRounds,
+      acceptedFailures,
+      serverMode,
+      honestMode,
+      noiseModel,
+      maliciousModel,
+    };
+
+    fetch("http://localhost:4000/api/delegate-verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`Backend error: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then((data) => {
+        if (requestIdRef.current !== requestId) {
+          return;
+        }
+        const result = {
+          failedTestRounds: Number(data.failedTestRounds) || 0,
+          resultBit: Number(data.resultBit) === 1 ? 1 : 0,
+        };
+        pendingResultRef.current = result;
+        if (isProgressDoneRef.current) {
+          applyVerificationResults(result);
+        }
+      })
+      .catch((error) => {
+        if (requestIdRef.current !== requestId) {
+          return;
+        }
+        console.error("Delegate verification failed", error);
+        resetResults();
+      });
   };
 
   useEffect(() => {

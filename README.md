@@ -15,12 +15,12 @@ This project showcases protocols for verification of delegated quantum computati
 ## Setup
 ### 1) Initialize the Veriphix submodule
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software
+cd /path/to/the-verification-software
 git submodule update --init --recursive
 ```
 Switch the Veriphix submodule to the `simulations` branch:
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software/backend/veriphix
+cd /path/to/the-verification-software/backend/veriphix
 git checkout simulations
 ```
 
@@ -28,7 +28,7 @@ git checkout simulations
 The backend is configured to run the simulation using the virtual environment at `backend/veriphix/.venv`.
 
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software/backend/veriphix
+cd /path/to/the-verification-software/backend/veriphix
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
@@ -37,33 +37,33 @@ pip install -r requirements.txt
 ### 3) Initialize Veriphix circuits
 Run this from the `backend/veriphix` folder to generate the `circuits/` data used by the simulator.
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software/backend/veriphix
+cd /path/to/the-verification-software/backend/veriphix
 python -m veriphix.sampling_circuits.sampling_circuits --ncircuits 1000 --nqubits 4 --depth 5 --p-gate 0.5 --p-cnot 0.25 --p-cnot-flip 0.5 --p-rx 0.5 --seed 1729 --target circuits
 ```
 
 ### 4) Install frontend dependencies
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software/verification-software-front
+cd /path/to/the-verification-software/verification-software-front
 npm install
 ```
 
 ### 5) Install backend dependencies
 The backend uses only Node built-ins.
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software/backend
+cd /path/to/the-verification-software/backend
 npm install
 ```
 
 ## Running
 ### Start the backend
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software/backend
+cd /path/to/the-verification-software/backend
 npm run dev
 ```
 
 ### Start the frontend
 ```bash
-cd /Users/sabdulsa/Codes/the-verification-software/verification-software-front
+cd /path/to/the-verification-software/verification-software-front
 npm run dev
 ```
 

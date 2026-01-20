@@ -1,0 +1,3 @@
+[submodule "backend/veriphix"]
+	path = backend/veriphix
+	url = git@github.com:jemappellesami/veriphix.git

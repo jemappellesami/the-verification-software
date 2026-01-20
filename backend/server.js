@@ -1,4 +1,5 @@
 const http = require("http");
+const { spawn } = require("child_process");
 
 const PORT = process.env.PORT || 4000;
 
@@ -37,11 +38,48 @@ const server = http.createServer((req, res) => {
     req.on("end", () => {
       try {
         const payload = body ? JSON.parse(body) : {};
-        const testRounds = Number(payload.testRounds) || 1;
-        const safeTestRounds = Math.max(testRounds, 1);
-        const failedTestRounds = Math.floor(Math.random() * safeTestRounds);
-        const resultBit = Math.random() < 0.5 ? 0 : 1;
-        sendJson(res, 200, { failedTestRounds, resultBit });
+        const python = spawn("python3", ["veriphix_instance.py"], {
+          cwd: __dirname,
+          stdio: ["pipe", "pipe", "pipe"],
+        });
+
+        let stdout = "";
+        let stderr = "";
+
+        python.stdout.on("data", (chunk) => {
+          stdout += chunk.toString();
+        });
+
+        python.stderr.on("data", (chunk) => {
+          stderr += chunk.toString();
+        });
+
+        python.on("error", (error) => {
+          sendJson(res, 500, { error: "Failed to start Python process" });
+          console.error("Python spawn error", error);
+        });
+
+        python.on("close", (code) => {
+          if (code !== 0) {
+            sendJson(res, 500, {
+              error: "Python process failed",
+              details: stderr.trim() || `Exit code ${code}`,
+            });
+            return;
+          }
+          try {
+            const result = JSON.parse(stdout || "{}");
+            sendJson(res, 200, {
+              failedTestRounds: Number(result.failedTestRounds) || 0,
+              resultBit: Number(result.resultBit) === 1 ? 1 : 0,
+            });
+          } catch (error) {
+            sendJson(res, 500, { error: "Invalid response from Python" });
+          }
+        });
+
+        python.stdin.write(JSON.stringify(payload));
+        python.stdin.end();
       } catch (error) {
         sendJson(res, 400, { error: "Invalid JSON payload" });
       }
